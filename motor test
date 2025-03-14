@@ -60,6 +60,21 @@ void turnLeftOnSpot() {
     PTD->PSOR = (1 << BL_MOTOR_PIN); // CW
 }
 
+void turnRightReverse() {
+    PTD->PSOR = (1 << FR_MOTOR_PIN); // CW (Reversing)
+    PTD->PCOR = (1 << FL_MOTOR_PIN); // CCW (Reversing + Slower for turning)
+    PTD->PCOR = (1 << BR_MOTOR_PIN); // CCW (Reversing)
+    PTD->PSOR = (1 << BL_MOTOR_PIN); // CW (Reversing + Faster for turning)
+}
+
+void turnLeftReverse() {
+    PTD->PCOR = (1 << FR_MOTOR_PIN); // CCW (Reversing + Faster for Turning)
+    PTD->PSOR = (1 << FL_MOTOR_PIN); // CW (Reversing)
+    PTD->PSOR = (1 << BR_MOTOR_PIN); // CW (Reversing + Slower for Turning)
+    PTD->PCOR = (1 << BL_MOTOR_PIN); // CCW (Reversing)
+}
+
+
 void stopMotors() {
     PTD->PCOR = (1 << FR_MOTOR_PIN) | (1 << FL_MOTOR_PIN) | 
                 (1 << BR_MOTOR_PIN) | (1 << BL_MOTOR_PIN);
@@ -164,7 +179,7 @@ void moveReverse(int speed) {
     setMotorSpeed(4, speed);
 }
 
-// Turn Right Moving
+// Turn Right Forward
 void turnRightMoving(int speed, int x) {
     setMotorDirection(1, 0); // CCW
     setMotorDirection(2, 0); // CCW + x
@@ -177,7 +192,7 @@ void turnRightMoving(int speed, int x) {
     setMotorSpeed(4, speed + x);
 }
 
-// Turn Left Moving
+// Turn Left Forward
 void turnLeftMoving(int speed, int x) {
     setMotorDirection(1, 0); // CCW + x
     setMotorDirection(2, 0); // CCW
@@ -188,6 +203,58 @@ void turnLeftMoving(int speed, int x) {
     setMotorSpeed(2, speed);
     setMotorSpeed(3, speed + x);
     setMotorSpeed(4, speed);
+}
+
+// Turn Right Reverse
+void turnRightReverse(int speed, int x) {
+    setMotorDirection(1, 1); // CW (Reversing, Slower)
+    setMotorDirection(2, 1); // CW (Reversing, Faster)
+    setMotorDirection(3, 0); // CCW (Reversing)
+    setMotorDirection(4, 0); // CCW (Reversing, Faster)
+    
+    setMotorSpeed(1, speed);
+    setMotorSpeed(2, speed + x);
+    setMotorSpeed(3, speed);
+    setMotorSpeed(4, speed + x);
+}
+
+// Turn right on the spot
+void turnRightOnSpot(int speed) {
+    setMotorDirection(1, 1); // Front Right CW
+    setMotorDirection(2, 0); // Front Left CCW
+    setMotorDirection(3, 1); // Back Right CW
+    setMotorDirection(4, 0); // Back Left CCW
+    
+    setMotorSpeed(1, speed);
+    setMotorSpeed(2, speed);
+    setMotorSpeed(3, speed);
+    setMotorSpeed(4, speed);
+}
+
+// Turn Left On the Spot
+void turnLeftOnSpot(int speed) {
+    setMotorDirection(1, 0); // Front Right CCW
+    setMotorDirection(2, 1); // Front Left CW
+    setMotorDirection(3, 0); // Back Right CCW
+    setMotorDirection(4, 1); // Back Left CW
+    
+    setMotorSpeed(1, speed);
+    setMotorSpeed(2, speed);
+    setMotorSpeed(3, speed);
+    setMotorSpeed(4, speed);
+}
+
+// Turn Left Reverse
+void turnLeftReverse(int speed, int x) {
+    setMotorDirection(1, 1); // CW (Reversing, Faster)
+    setMotorDirection(2, 1); // CW (Reversing)
+    setMotorDirection(3, 0); // CCW (Reversing, Slower)
+    setMotorDirection(4, 0); // CCW (Reversing, Faster)
+    
+    setMotorSpeed(1, speed + x);
+    setMotorSpeed(2, speed);
+    setMotorSpeed(3, speed);
+    setMotorSpeed(4, speed + x);
 }
 
 // Stop Motors
