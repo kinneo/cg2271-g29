@@ -7,8 +7,6 @@ typedef struct {
     uint8_t count;
 } Queue_t;
 
-volatile Queue_t RxQ;  // Receive queue
-
 // Queue Initialization
 void Q_Init(volatile Queue_t *q) {
     q->head = 0;
