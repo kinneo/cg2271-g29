@@ -8,6 +8,7 @@
 
 volatile uint8_t packet_buffer[PACKET_SIZE];  // Buffer to store received data
 volatile uint8_t packet_index = 0;  // Tracks the current byte received in the packet
+volatile Queue_t RxQ;
 
 void Init_UART2(uint32_t baud_rate) {
     uint32_t divisor;
