@@ -28,10 +28,10 @@ void Init_UART2(uint32_t baud_rate) {
     UART2->BDH = UART_BDH_SBR(divisor>>8);
     UART2->BDL = UART_BDL_SBR(divisor);
 
-    // No parity, 8 bits, two stop bits, other settings;
+    // 8N1 data frame config
     UART2->C1 = UART2->S2 = UART2->C3 = 0;
 
-    // Enable transmitter and receiver
+    // Enable receiver
     UART2->C2 = UART_C2_RE_MASK; 
 
     NVIC_SetPriority(UART2_IRQn, 128); // 0 (0), 64 (1), 128 (2)...
