@@ -9,11 +9,8 @@
 #define rightTurnReverse 6
 #define leftTurnReverse 7
 #define brake 8
-#define x 5 //minus speed on the respective side when doing curved turns
 
-// 7500 = Full duty cycle (HIGH, IN1 = 1, IN2 = 0 for Forward)
-// 0 = No duty cycle (LOW, IN1 = 0, IN2 = 1 for Reverse)
-#define PWM_MAX 7500
+#define PWM_MAX 4999
 #define PWM_HIGH PWM_MAX
 #define PWM_LOW 0
 
@@ -39,24 +36,34 @@ void initMotor(){
 	SIM->SCGC6 |= SIM_SCGC6_TPM1_MASK; // TPM1 for speed
 	SIM->SCGC6 |= SIM_SCGC6_TPM2_MASK; // TPM2 for direction
 	SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK; // Port B for PWM
-	// SIM->SCGC5 |= SIM_SCGC5_PORTD_MASK; // Port D
 	
 	// 2. Configure PWM Pins
 	PORTB->PCR[0] &= ~PORT_PCR_MUX_MASK;
-	PORTB->PCR[0] |= PORT_PCR_MUX(3); // enable ALT3 (TPM1_CH0) on PTB0 (Left Speed)
+	PORTB->PCR[0] = PORT_PCR_MUX(3); // enable ALT3 (TPM1_CH0) on PTB0 (Left Speed)
 	
 	PORTB->PCR[1] &= ~PORT_PCR_MUX_MASK;
-	PORTB->PCR[1] |= PORT_PCR_MUX(3); // enable ALT3 (TPM1_CH1) on PTB1 (Right Speed)
+	PORTB->PCR[1] = PORT_PCR_MUX(3); // enable ALT3 (TPM1_CH1) on PTB1 (Right Speed)
 	
 	PORTB->PCR[2] &= ~PORT_PCR_MUX_MASK;
-	PORTB->PCR[2] |= PORT_PCR_MUX(3); // enable ALT3 (TPM2_CH0) on PTB2 (Left Direction)
+	PORTB->PCR[2] = PORT_PCR_MUX(3); // enable ALT3 (TPM2_CH0) on PTB2 (Left Direction)
 	
 	PORTB->PCR[3] &= ~PORT_PCR_MUX_MASK;
-	PORTB->PCR[3] |= PORT_PCR_MUX(3); // enable ALT3 (TPM2_CH1) on PTB3 (Right Direction)
+	PORTB->PCR[3] = PORT_PCR_MUX(3); // enable ALT3 (TPM2_CH1) on PTB3 (Right Direction)
 		
+	// set TPM clock source (i dont exactly know what this does)
+	SIM->SOPT2 &= ~SIM_SOPT2_TPMSRC_MASK;
+  SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1);
+	
 	// set PWM period
-	TPM1->MOD = 7500;
-	TPM2->MOD = 7500;
+	TPM1->MOD = PWM_MAX;
+	TPM2->MOD = PWM_MAX;
+	
+	// clear CMOD and set CMOD
+	TPM1->SC &= ~TPM_SC_CMOD_MASK;
+	TPM1->SC |= TPM_SC_CMOD(1);
+	TPM2->SC &= ~TPM_SC_CMOD_MASK;
+	TPM2->SC |= TPM_SC_CMOD(1);
+	
 	
 	// clear prescaler and set prescalar to 32
 	TPM1->SC &= ~TPM_SC_PS_MASK;
@@ -95,94 +102,96 @@ void initMotor(){
 }
 
 void motorControl(int state, int speed){
-	
-	// Setting motor directions using GPIO pins.
-	// Adjusting motor speed using PWM.
-	
+
 	// Convert speed (0-100) to duty cycle
+	if (speed < 0) speed = 0;
+	if (speed > 100) speed = 100;
 	int dutyCycle = (speed * PWM_MAX) / 100; // need to change this base on wuming's angle input
 
 	
 	switch(state){
 		
+		// motor rotate forward (CW) = 01, motor rotate reverse (CCW) = 10, stop = 00
+		// TPM1 is for both left motors, TPM2 is for both right motors
+		
 		case forward:
-
-			TPM1_C0V = dutyCycle; // Left Speed
-			TPM1_C1V = dutyCycle; // Right Speed
-			TPM2_C0V = CW; // Left Direction
-			TPM2_C1V = CCW; // Right Direction
+			// left motors = 01, right motors = 01
+			TPM1_C0V = 0; 
+			TPM1_C1V = dutyCycle; 
+			TPM2_C0V = 0; 
+			TPM2_C1V = dutyCycle; 
 			break;
 		
 		case rightTurnOnSpot:
-
-			TPM1_C0V = dutyCycle; // Left Speed
-			TPM1_C1V = dutyCycle; // Right Speed
-			TPM2_C0V = CW; // Left Direction
-			TPM2_C1V = CW; // Right Direction
+			// left motors = 01, right motors = 10
+			TPM1_C0V = 0; 
+			TPM1_C1V = dutyCycle; 
+			TPM2_C0V = dutyCycle; 
+			TPM2_C1V = 0; 
 			break;
 		
 		case reverse:
-
-			TPM1_C0V = dutyCycle; // Left Speed
-			TPM1_C1V = dutyCycle; // Right Speed
-			TPM2_C0V = CCW; // Left Direction
-			TPM2_C1V = CW; // Right Direction
+			// left motors = 10, right motors = 10
+			TPM1_C0V = dutyCycle; 
+			TPM1_C1V = 0; 
+			TPM2_C0V = dutyCycle; 
+			TPM2_C1V = 0; 
 			break;
 			
 		case leftTurnOnSpot:
-
-			TPM1_C0V = dutyCycle; // Left Speed
-			TPM1_C1V = dutyCycle; // Right Speed
-			TPM2_C0V = CCW; // Left Direction
-			TPM2_C1V = CCW; // Right Direction
+			// left motors = 10, right motors = 01
+			TPM1_C0V = dutyCycle;
+			TPM1_C1V = 0; 
+			TPM2_C0V = 0; 
+			TPM2_C1V = dutyCycle; 
 			break;
 		
 		case rightTurnForward:
-
-			TPM1_C0V = dutyCycle; // Left Speed
-			TPM1_C1V = dutyCycle - x; // Right Speed
-			TPM2_C0V = CW; // Left Direction
-			TPM2_C1V = CCW; // Right Direction
+			// left motors = 01, right motors = 01
+			TPM1_C0V = 0; 
+			TPM1_C1V = dutyCycle; 
+			TPM2_C0V = 0; 
+			TPM2_C1V = dutyCycle * 0.7; 
 			break;
 		
 		case leftTurnForward:
-
-			TPM1_C0V = dutyCycle - x; // Left Speed
-			TPM1_C1V = dutyCycle; // Right Speed
-			TPM2_C0V = CW; // Left Direction
-			TPM2_C1V = CCW; // Right Direction
+			// left motors = 01, right motors = 01
+			TPM1_C0V = 0; 
+			TPM1_C1V = dutyCycle * 0.7; 
+			TPM2_C0V = 0; 
+			TPM2_C1V = dutyCycle; 
 			break;
 		
 		case rightTurnReverse:
-
-			TPM1_C0V = dutyCycle; // Left Speed
-			TPM1_C1V = dutyCycle - x; // Right Speed
-			TPM2_C0V = CCW; // Left Direction
-			TPM2_C1V = CW; // Right Direction
+			// left motors = 10, right motors = 10
+			TPM1_C0V = dutyCycle; 
+			TPM1_C1V = 0; 
+			TPM2_C0V = dutyCycle * 0.7; 
+			TPM2_C1V = 0;
 			break;
 			
 		case leftTurnReverse:
-
-			TPM1_C0V = dutyCycle - x; // Left Speed
-			TPM1_C1V = dutyCycle; // Right Speed
-			TPM2_C0V = CCW; // Left Direction
-			TPM2_C1V = CW; // Right Direction
+			// left motors = 10, right motors = 10
+			TPM1_C0V = dutyCycle * 0.7; 
+			TPM1_C1V = 0; 
+			TPM2_C0V = dutyCycle; 
+			TPM2_C1V = 0; 
 			break;
 		
 		case brake:
-
-			TPM1_C0V = PWM_LOW; // Left Speed
-			TPM1_C1V = PWM_LOW; // Right Speed
-			TPM2_C0V = PWM_LOW; // Left Direction
-			TPM2_C1V = PWM_LOW; // Right Direction
+			// both left right 00
+			TPM1_C0V = 0; 
+			TPM1_C1V = 0;
+			TPM2_C0V = 0; 
+			TPM2_C1V = 0; 
 			break;
 		
 		default:
-
-			TPM1_C0V = PWM_LOW; // Left Speed
-			TPM1_C1V = PWM_LOW; // Right Speed
-			TPM2_C0V = PWM_LOW; // Left Direction
-			TPM2_C1V = PWM_LOW; // Right Direction
+			// both left right 00
+			TPM1_C0V = 0; 
+			TPM1_C1V = 0;
+			TPM2_C0V = 0; 
+			TPM2_C1V = 0; 
 			break;
 	}
 }
