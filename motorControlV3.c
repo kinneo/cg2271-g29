@@ -36,6 +36,7 @@ void initMotor(){
 	SIM->SCGC6 |= SIM_SCGC6_TPM1_MASK; // TPM1 for speed
 	SIM->SCGC6 |= SIM_SCGC6_TPM2_MASK; // TPM2 for direction
 	SIM->SCGC5 |= SIM_SCGC5_PORTB_MASK; // Port B for PWM
+	// SIM->SCGC5 |= SIM_SCGC5_PORTD_MASK; // Port D
 	
 	// 2. Configure PWM Pins
 	PORTB->PCR[0] &= ~PORT_PCR_MUX_MASK;
@@ -101,13 +102,27 @@ void initMotor(){
 	
 }
 
-void motorControl(int state, int speed){
+
+// Function to determine turn factor based on 2-bit turn angle input
+// this is only for curved turns, for 90 degree and 0 degree, it shld go to the respective forward and turn on spot code
+float getTurnFactor(uint8_t turnBits) {
+    switch(turnBits) {
+        case 0b00: return 0.2;  // 20 degrees -> sharpest turn
+        case 0b01: return 0.4;  // 40 degrees
+        case 0b10: return 0.6;  // 60 degrees
+        case 0b11: return 0.8;  // 80 degrees -> least sharp
+        default: return 1.0;  // Default case (should not happen)
+    }
+}
+
+void motorControl(int state, int speed, uint8_t turnBits){
 
 	// Convert speed (0-100) to duty cycle
 	if (speed < 0) speed = 0;
 	if (speed > 100) speed = 100;
 	int dutyCycle = (speed * PWM_MAX) / 100; // need to change this base on wuming's angle input
 
+	float turnFactor = getTurnFactor(turnBits);
 	
 	switch(state){
 		
@@ -151,13 +166,13 @@ void motorControl(int state, int speed){
 			TPM1_C0V = 0; 
 			TPM1_C1V = dutyCycle; 
 			TPM2_C0V = 0; 
-			TPM2_C1V = dutyCycle * 0.7; 
+			TPM2_C1V = dutyCycle * turnFactor; 
 			break;
 		
 		case leftTurnForward:
 			// left motors = 01, right motors = 01
 			TPM1_C0V = 0; 
-			TPM1_C1V = dutyCycle * 0.7; 
+			TPM1_C1V = dutyCycle * turnFactor; 
 			TPM2_C0V = 0; 
 			TPM2_C1V = dutyCycle; 
 			break;
@@ -166,13 +181,13 @@ void motorControl(int state, int speed){
 			// left motors = 10, right motors = 10
 			TPM1_C0V = dutyCycle; 
 			TPM1_C1V = 0; 
-			TPM2_C0V = dutyCycle * 0.7; 
+			TPM2_C0V = dutyCycle * turnFactor; 
 			TPM2_C1V = 0;
 			break;
 			
 		case leftTurnReverse:
 			// left motors = 10, right motors = 10
-			TPM1_C0V = dutyCycle * 0.7; 
+			TPM1_C0V = dutyCycle * turnFactor; 
 			TPM1_C1V = 0; 
 			TPM2_C0V = dutyCycle; 
 			TPM2_C1V = 0; 
