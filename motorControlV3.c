@@ -53,7 +53,7 @@ void initMotor(){
 		
 	// set TPM clock source (i dont exactly know what this does)
 	SIM->SOPT2 &= ~SIM_SOPT2_TPMSRC_MASK;
-  SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1);
+  	SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1);
 	
 	// set PWM period
 	TPM1->MOD = PWM_MAX;
