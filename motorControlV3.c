@@ -53,7 +53,7 @@ void initMotor(){
 		
 	// set TPM clock source (i dont exactly know what this does)
 	SIM->SOPT2 &= ~SIM_SOPT2_TPMSRC_MASK;
-  	SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1);
+  SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1);
 	
 	// set PWM period
 	TPM1->MOD = PWM_MAX;
@@ -140,8 +140,8 @@ void motorControl(int state, int speed, uint8_t turnBits){
 		case rightTurnOnSpot:
 			// left motors = 01, right motors = 10
 			TPM1_C0V = 0; 
-			TPM1_C1V = dutyCycle; 
-			TPM2_C0V = dutyCycle; 
+			TPM1_C1V = dutyCycle * turnFactor; 
+			TPM2_C0V = dutyCycle * turnFactor; 
 			TPM2_C1V = 0; 
 			break;
 		
@@ -155,10 +155,10 @@ void motorControl(int state, int speed, uint8_t turnBits){
 			
 		case leftTurnOnSpot:
 			// left motors = 10, right motors = 01
-			TPM1_C0V = dutyCycle;
+			TPM1_C0V = dutyCycle * turnFactor;
 			TPM1_C1V = 0; 
 			TPM2_C0V = 0; 
-			TPM2_C1V = dutyCycle; 
+			TPM2_C1V = dutyCycle * turnFactor; 
 			break;
 		
 		case rightTurnForward:
