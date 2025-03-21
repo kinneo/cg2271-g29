@@ -2,7 +2,7 @@
 #include <Packet.h>
 void setup() {
   Serial.begin(115200);
-  Serial2.begin(9600, SERIAL_8N1, 16, -1);
+  Serial2.begin(9600, SERIAL_8N1, 17, -1);
   PS4.begin();
   Serial.println("Ready.");
 }
