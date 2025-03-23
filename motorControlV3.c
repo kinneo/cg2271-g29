@@ -90,11 +90,7 @@ void initMotor(){
 	TPM1_C1SC |= (TPM_CnSC_ELSB(1) | TPM_CnSC_MSB(1));
 	TPM2_C1SC |= (TPM_CnSC_ELSB(1) | TPM_CnSC_MSB(1));
 	
-	// initialize PWM outputs to 0
-	TPM1_C0V = 0;
-	TPM1_C1V = 0;
-	TPM2_C0V = 0;
-	TPM2_C1V = 0;
+
 	
 	// 5. Enable TPM Counter (set the cmod bits to 1 to use internal clock)
 	TPM1->SC |= TPM_SC_CMOD(1); 
@@ -107,10 +103,11 @@ void initMotor(){
 // this is only for curved turns, for 90 degree and 0 degree, it shld go to the respective forward and turn on spot code
 float getTurnFactor(uint8_t turnBits) {
     switch(turnBits) {
-        case 0b00: return 0.2;  // 20 degrees -> sharpest turn
-        case 0b01: return 0.4;  // 40 degrees
-        case 0b10: return 0.6;  // 60 degrees
-        case 0b11: return 0.8;  // 80 degrees -> least sharp
+			// note: 0.5 is the lowest, any lower the wheel won't turn
+        case 0b00: return 1.0;  // either 0 degrees or 90 degrees aka no change
+        case 0b01: return 0.5;  // 22.5 degrees
+        case 0b10: return 0.65;  // 45 degrees
+        case 0b11: return 0.8;  // 67.5 degrees
         default: return 1.0;  // Default case (should not happen)
     }
 }
@@ -141,7 +138,7 @@ void motorControl(int state, int speed, uint8_t turnBits){
 			// left motors = 01, right motors = 10
 			TPM1_C0V = 0; 
 			TPM1_C1V = dutyCycle * turnFactor; 
-			TPM2_C0V = dutyCycle * turnFactor; 
+			TPM2_C0V = dutyCycle  * turnFactor; 
 			TPM2_C1V = 0; 
 			break;
 		
@@ -155,10 +152,10 @@ void motorControl(int state, int speed, uint8_t turnBits){
 			
 		case leftTurnOnSpot:
 			// left motors = 10, right motors = 01
-			TPM1_C0V = dutyCycle * turnFactor;
+			TPM1_C0V = dutyCycle  * turnFactor;
 			TPM1_C1V = 0; 
 			TPM2_C0V = 0; 
-			TPM2_C1V = dutyCycle * turnFactor; 
+			TPM2_C1V = dutyCycle  * turnFactor; 
 			break;
 		
 		case rightTurnForward:
@@ -209,4 +206,21 @@ void motorControl(int state, int speed, uint8_t turnBits){
 			TPM2_C1V = 0; 
 			break;
 	}
+}
+
+
+int main (void) {
+     initMotor();
+
+    while(1){
+			//motorControl(forward, 80, 0b00); 
+			//motorControl(rightTurnOnSpot, 80, 0b00); 
+			//motorControl(reverse, 80, 0b00); 
+			//motorControl(leftTurnOnSpot, 80, 0b00);
+			//motorControl(rightTurnForward, 80, 0b10); 
+			motorControl(leftTurnForward, 80, 0b10); 
+			//motorControl(rightTurnReverse, 80, 0b00); 
+			//motorControl(leftTurnReverse, 80, 0b00); 
+			//motorControl(brake, 80, 0b00); 
+		};
 }
