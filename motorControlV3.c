@@ -213,12 +213,12 @@ int main (void) {
      initMotor();
 
     while(1){
-			//motorControl(forward, 80, 0b00); 
+			motorControl(forward, 80, 0b00); 
 			//motorControl(rightTurnOnSpot, 80, 0b00); 
 			//motorControl(reverse, 80, 0b00); 
 			//motorControl(leftTurnOnSpot, 80, 0b00);
 			//motorControl(rightTurnForward, 80, 0b10); 
-			motorControl(leftTurnForward, 80, 0b10); 
+			//motorControl(leftTurnForward, 80, 0b10); 
 			//motorControl(rightTurnReverse, 80, 0b00); 
 			//motorControl(leftTurnReverse, 80, 0b00); 
 			//motorControl(brake, 80, 0b00); 
