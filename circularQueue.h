@@ -1,4 +1,6 @@
 #define QUEUE_SIZE 16  // Maximum packets stored in queue
+#include <MKL25Z4.h>
+#include <stdbool.h>
 
 typedef struct {
     uint8_t buffer[QUEUE_SIZE];
