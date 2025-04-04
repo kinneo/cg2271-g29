@@ -105,9 +105,9 @@ float getTurnFactor(uint8_t turnBits) {
     switch(turnBits) {
 			// note: 0.5 is the lowest, any lower the wheel won't turn
         case 0b00: return 1.0;  // either 0 degrees or 90 degrees aka no change
-        case 0b01: return 0.5;  // 22.5 degrees
-        case 0b10: return 0.65;  // 45 degrees
-        case 0b11: return 0.8;  // 67.5 degrees
+        case 0b01: return 0.6;  // 22.5 degrees
+        case 0b10: return 0.6;  // 45 degrees
+        case 0b11: return 0.6;  // 67.5 degrees
         default: return 1.0;  // Default case (should not happen)
     }
 }
