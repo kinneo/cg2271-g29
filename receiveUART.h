@@ -1,14 +1,26 @@
 #include <MKL25Z4.h>
-#include "circularQueue.h"
+#include <stdio.h>
+
+#include "RTE_Components.h"
+#include CMSIS_device_header
+#include "cmsis_os2.h"
 
 #define MASK(x) (1 << (x))
 
 #define PACKET_SIZE 1  // Each packet is 8 bits (1 byte)
 
-volatile Queue_t RxQ;
 volatile uint8_t received_byte = 0;
 volatile int received = 0;
 volatile int triggered = 0;
+
+osSemaphoreId_t serialFlag;
+ osSemaphoreId_t motorFlag;
+ osSemaphoreId_t audioRunningFlag;
+ osSemaphoreId_t audioEndFlag;
+ osSemaphoreId_t greenMovingFlag;
+ osSemaphoreId_t greenStationaryFlag;
+ osSemaphoreId_t redMovingFlag;
+ osSemaphoreId_t redStationaryFlag;
 
 void Init_UART2(uint32_t baud_rate) {
     uint32_t divisor;
@@ -18,11 +30,11 @@ void Init_UART2(uint32_t baud_rate) {
     SIM->SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
     // Connect UART to pins for PTE23
-		PORTE->PCR[23] &= ~PORT_PCR_MUX_MASK;
+	PORTE->PCR[23] &= ~PORT_PCR_MUX_MASK;
     PORTE->PCR[23] |= PORT_PCR_MUX(4);
 	
-		PORTE->PCR[22] = PORT_PCR_MUX(4);
-		UART2->C2 |= UART_C2_TE_MASK; // For TX
+	PORTE->PCR[22] = PORT_PCR_MUX(4);
+	UART2->C2 |= UART_C2_TE_MASK; // For TX
 
 
 
@@ -48,7 +60,6 @@ void Init_UART2(uint32_t baud_rate) {
     NVIC_EnableIRQ(UART2_IRQn);
 
     UART2->C2 |= UART_C2_RIE_MASK; // Enables the receive interrupt.
-    Q_Init(&RxQ); // Receive Queue
  }
 
 
@@ -57,6 +68,6 @@ void UART2_IRQHandler(void) {
 	if (UART2->S1 & UART_S1_RDRF_MASK) {
 		received = 1;
 		received_byte = UART2->D;
+        osSemaphoreRelease(serialFlag);
 	}
 }
-		
