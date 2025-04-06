@@ -35,48 +35,88 @@
 
 
 uint16_t freqEnd[] = { 
+	rest, rest, rest, rest,
+	rest, rest, rest, rest,
+	rest, rest, note_C, rest,
+	note_E, rest, note_G, rest, // bar 1
+	note_A, rest, rest, rest,
+	rest, rest, rest, rest,
+	note_G, rest, rest, rest,
+	rest, rest, note_C, rest, // bar 2
+	note_D, rest, note_D, rest,
+	note_C, rest, note_E, rest,
+	rest, rest, rest, rest,
+	note_E, rest, note_G, rest, // bar 3
+	note_A, rest, note_B, rest,
+	note_A, rest, note_G, rest,
+	note_E, rest, note_D, rest,
+	note_D, rest, note_C, rest, // bar 4
+	note_D, rest, note_D, rest,
+	note_E, rest, note_C, rest,
+	rest, rest, note_C, rest,
+	note_E, rest, note_G, rest, // bar 5
+	note_A, rest, rest, rest,
+	rest, rest, rest, rest,
+	note_G, rest, rest, rest,
+	rest, rest, note_C, rest, // bar 6
+	note_D, rest, note_D, rest,
+	note_C, rest, note_E, rest,
+	rest, rest, rest, rest,
+	note_E, rest, note_G, rest, // bar 7
+	note_A, rest, note_C1, rest,
+	note_D1, rest, note_E1, rest,
+	note_D1, rest, note_C1, rest,
+	note_A, rest, note_C1, rest, // bar 8
+	note_D1, rest, note_D1, rest,
+	note_C1, rest, note_C1, rest,
+	rest, rest, rest, rest, 
+	note_A, rest, note_C1, rest, // bar 9
+	note_D1, rest, note_D1, rest,
+	note_C1, rest, note_C1, rest,
+	rest, rest, rest, rest,
+	rest, rest, rest, rest, // bar 10
 };
 
 uint16_t freqRunning[] = { 
-		// line 1
-    note_As, rest, rest, rest, 
-		note_As, rest, rest, rest, 
-		note_As, rest, rest, rest,  
-		note_As, rest, rest, rest,  // bar 1
-		note_As, rest, rest, note_B,
-	  rest, rest, note_D1s, rest,
-	  note_As, rest, rest, rest,  
-	  note_As, rest, rest, rest, // bar 2
-		note_As, rest, rest, note_B,
-	  rest, rest, note_D1s, rest,
-	  note_As, rest, rest, rest,  
-	  note_As, rest, rest, rest, // bar 3
-		note_As, rest, rest, note_B,
-	  rest, rest, note_D1s, rest,
-	  note_As, rest, rest, rest,  
-	  note_As, rest, rest, rest, // bar 4 
-	  // line 2
-		note_As, rest, rest, note_Gs,
-		rest, rest, note_Fs, rest,
-		note_Ds, rest, rest, rest,
-	  note_Ds, rest, rest, rest, // bar 1
-		note_As, rest, rest, note_Gs,
-		rest, rest, note_Fs, rest,
-		note_Ds, rest, rest, rest,
-	  note_Ds, rest, rest, rest, // bar 2
-		note_Ads, rest, rest, note_Bd,
-		rest, rest, note_Ds, rest,
-		note_Ads, rest, rest, rest,
-		note_Ads, rest, rest, rest, // bar 4
-		note_Ads, rest, rest, note_Bd,
-		rest, rest, note_Ds, rest,
-		note_Ads, rest, rest, rest,
-		note_Ads, rest, rest, rest,
-		// rest
-		rest, rest, rest, rest,
-		rest, rest, rest, rest,
-		rest, rest, rest, rest,
-		rest, rest, rest, rest,
+
+	note_As, rest, rest, rest, 
+	note_As, rest, rest, rest, 
+	note_As, rest, rest, rest,  
+	note_As, rest, rest, rest,  // bar 1
+	note_As, rest, rest, note_B,
+	rest, rest, note_D1s, rest,
+	note_As, rest, rest, rest,  
+	note_As, rest, rest, rest, // bar 2
+	note_As, rest, rest, note_B,
+	rest, rest, note_D1s, rest,
+	note_As, rest, rest, rest,  
+	note_As, rest, rest, rest, // bar 3
+	note_As, rest, rest, note_B,
+	rest, rest, note_D1s, rest,
+	note_As, rest, rest, rest,  
+	note_As, rest, rest, rest, // bar 4 
+
+	note_As, rest, rest, note_Gs,
+	rest, rest, note_Fs, rest,
+	note_Ds, rest, rest, rest,
+	note_Ds, rest, rest, rest, // bar 1
+	note_As, rest, rest, note_Gs,
+	rest, rest, note_Fs, rest,
+	note_Ds, rest, rest, rest,
+	note_Ds, rest, rest, rest, // bar 2
+	note_Ads, rest, rest, note_Bd,
+	rest, rest, note_Ds, rest,
+	note_Ads, rest, rest, rest,
+	note_Ads, rest, rest, rest, // bar 3
+	note_Ads, rest, rest, note_Bd,
+	rest, rest, note_Ds, rest,
+	note_Ads, rest, rest, rest,
+	note_Ads, rest, rest, rest, // bar 4
+	// rest
+	rest, rest, rest, rest,
+	rest, rest, rest, rest,
+	rest, rest, rest, rest,
+	rest, rest, rest, rest,
 };
 
 void InitAudio(void){
