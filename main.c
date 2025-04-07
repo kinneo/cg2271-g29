@@ -49,10 +49,10 @@ void stopAudioThread(void *argument){
             osSemaphoreAcquire(audioEndFlag, osWaitForever);
             TPM0->MOD = CLOCK / freqEnd[i];
             TPM0_C0V = (CLOCK / freqEnd[i]) / 8; // 12.5% duty cycle
-            osDelay(100);
+            osDelay(65);
             TPM0_C0V = 0x0;
             isComplete ? osSemaphoreRelease(audioEndFlag) : osSemaphoreRelease(audioRunningFlag);
-            osDelay(100);
+            osDelay(65);
           }
     }
 }
@@ -108,16 +108,16 @@ void greenStationaryThread(void *argument){
 
 void redMovingThread(void *argument){
     for (;;){
-        osSemaphoreAcquire(redMovingFlag,osWaitForever);
+        //osSemaphoreAcquire(redMovingFlag,osWaitForever);
         PTC->PCOR = MASK(7); // Turn ON Red LED
-        osDelay(500); // Keep ON for 500ms
+				isMoving ? osDelay(250) : osDelay(250); // Keep ON for 500ms
         PTC->PSOR = MASK(7); // Turn OFF Red LED
-        osDelay(500); // Keep OFF for 500ms
-        isMoving ? osSemaphoreRelease(redMovingFlag) : osSemaphoreRelease(redStationaryFlag);
+        isMoving ? osDelay(250) : osDelay(250); // Keep OFF for 500ms
+       // isMoving ? osSemaphoreRelease(redMovingFlag) : osSemaphoreRelease(redStationaryFlag);
     }
 }
 
-void redStationaryThread(void *argument){
+/*void redStationaryThread(void *argument){
     for (;;){
         osSemaphoreAcquire(redStationaryFlag,osWaitForever);
         PTC->PSOR = MASK(7); // Turn ON Red LED
@@ -126,9 +126,10 @@ void redStationaryThread(void *argument){
         osDelay(250); // Keep OFF for 250ms
         isMoving ? osSemaphoreRelease(redMovingFlag) : osSemaphoreRelease(redStationaryFlag);
     }
-}
+}*/
 
 int main(void) {
+	
 	SystemCoreClockUpdate();
 	initMotor();
 	Init_UART2(9600);
@@ -137,14 +138,14 @@ int main(void) {
 
     osKernelInitialize();
     Init_RTOX();
-	osThreadNew(runningAudioThread, NULL, NULL);
+	  osThreadNew(runningAudioThread, NULL, NULL);
     osThreadNew(stopAudioThread, NULL, NULL);
     osThreadNew(serialThread, NULL, NULL);
     osThreadNew(motorThread, NULL, NULL);
     osThreadNew(greenMovingThread, NULL, NULL);
     osThreadNew(greenStationaryThread, NULL, NULL);
     osThreadNew(redMovingThread, NULL, NULL);
-    osThreadNew(redStationaryThread, NULL, NULL);
-    osKernelStart();   
+    //osThreadNew(redStationaryThread, NULL, NULL);
+    osKernelStart();
     for (;;) {}
 }
