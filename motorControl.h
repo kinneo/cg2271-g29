@@ -105,9 +105,9 @@ float getTurnFactor(uint8_t turnBits) {
     switch(turnBits) {
 			// note: 0.5 is the lowest, any lower the wheel won't turn
         case 0b00: return 1.0;  // either 0 degrees or 90 degrees aka no change
-        case 0b01: return 0.6;  // 22.5 degrees
-        case 0b10: return 0.6;  // 45 degrees
-        case 0b11: return 0.6;  // 67.5 degrees
+        case 0b01: return 0.5;  // 22.5 degrees
+        case 0b10: return 0.5;  // 45 degrees
+        case 0b11: return 0.5;  // 67.5 degrees
         default: return 1.0;  // Default case (should not happen)
     }
 }
@@ -137,8 +137,8 @@ void motorControl(int state, int speed, uint8_t turnBits){
 		case rightTurnOnSpot:
 			// left motors = 01, right motors = 10
 			TPM1_C0V = 0; 
-			TPM1_C1V = dutyCycle * turnFactor; 
-			TPM2_C0V = dutyCycle  * turnFactor; 
+			TPM1_C1V = dutyCycle; 
+			TPM2_C0V = dutyCycle; 
 			TPM2_C1V = 0; 
 			break;
 		
@@ -152,10 +152,10 @@ void motorControl(int state, int speed, uint8_t turnBits){
 			
 		case leftTurnOnSpot:
 			// left motors = 10, right motors = 01
-			TPM1_C0V = dutyCycle  * turnFactor;
+			TPM1_C0V = dutyCycle;
 			TPM1_C1V = 0; 
 			TPM2_C0V = 0; 
-			TPM2_C1V = dutyCycle  * turnFactor; 
+			TPM2_C1V = dutyCycle; 
 			break;
 		
 		case rightTurnForward:
@@ -164,7 +164,7 @@ void motorControl(int state, int speed, uint8_t turnBits){
 			TPM1_C1V = dutyCycle; 
 			TPM2_C0V = 0; 
 			TPM2_C1V = dutyCycle * turnFactor; 
-			break;
+			break;	
 		
 		case leftTurnForward:
 			// left motors = 01, right motors = 01
