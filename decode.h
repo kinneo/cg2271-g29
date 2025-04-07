@@ -37,7 +37,7 @@ void decode(uint8_t raw_data){
     data.A  = (raw_data) & 0b111;
     
     if(data.OP == 0b00){
-        speed = (data.B) ? 100 : 75;
+        speed = (data.B) ? 85 : 100 ;
         turnFactor = data.A % 4;
         if (data.D){
             //forward with turn
@@ -70,10 +70,12 @@ void decode(uint8_t raw_data){
 
     // Audio OP
     if(data.OP == 0b10){
-        if(data.D){
+        if(data.C){
             // complete function
             isComplete = true;
-        }
+        } else if(data.B){
+						isComplete = false;
+				}
 
     }
 }
